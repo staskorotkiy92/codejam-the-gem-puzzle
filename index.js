@@ -120,8 +120,8 @@ function loadTheGameField() {
     canvasWrapper.innerHTML += canvas;
     container.append(canvasWrapper);
     document.body.append(container);
-    document.getElementById('canvas').setAttribute('width', `400vw`);
-    document.getElementById('canvas').setAttribute('height', `400vh`);
+    document.getElementById('canvas').setAttribute('width', `600`);
+    document.getElementById('canvas').setAttribute('height', `600`);
     let options = document.createElement('div');
     options.classList.add('options');
     let list = document.createElement('ul');
@@ -132,10 +132,13 @@ function loadTheGameField() {
         listItem.setAttribute('id', i + 2);
         listItem.classList.add('listItem');
         list.append(listItem);
-
     }
     options.append(list);
     canvasWrapper.append(options);
+    let menu = document.createElement('div');
+    menu.classList.add('menu');
+    menu.insertAdjacentHTML('afterbegin', `<div class = "menu-item">Размешать и начать</div><div class = "menu-item">Стоп</div><div class = "menu-item">Сохранить</div><div class = "menu-item">Результаты</div>`);
+    canvasWrapper.prepend(menu);
 }
 loadTheGameField();
 

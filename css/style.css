@@ -2,33 +2,70 @@
     box-sizing: border-box;
 }
 
+html {
+    font-size: 10px;
+}
+
 .container {
+    font-size: 2.3rem;
     max-width: 70vw;
-    margin : 0 auto;
+    margin   : 0 auto;
 }
 
 .canvas-wrapper {
-    padding-top: 30px;
-    width: 100%;
-    height:100%;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
+    padding-top   : 30px;
+    width         : 600px;
+    margin        : 0 auto;
+    display       : flex;
+    flex-direction: column;
+
+
 }
 
 .canvas {
     background: gray;
+
 }
 
 .listItem {
     cursor: pointer;
-    padding: 0 15px;
 }
 
- .options-list {
-     list-style-type: none;
-     display: flex;
-     flex-direction: column;
- }
+.options-list {
+    list-style-type: none;
+    display        : flex;
+    justify-content: space-between;
+    padding        : 0;
+}
 
+.menu {
+    display        : flex;
+    justify-content: space-between;
+    align-items    : flex-start;
+    margin-bottom  : 10px;
+}
 
+.menu-item {
+    color           : white;
+    border-radius   : 3px;
+    padding         : 5px;
+    background-color: cyan;
+}
+
+@media (max-width: 900px) {
+    .container {
+        max-width: 900px;
+    }
+}
+
+@media (max-width: 640px) {
+    .container {
+        max-width: 640px;
+    }
+}
+
+@media (max-width: 375px) {
+    .container {
+        max-width: 375px;
+    }
+}
