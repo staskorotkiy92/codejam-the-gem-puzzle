@@ -86,7 +86,6 @@ class GamePuzzle {
         }
         if (this.clicks < this.lastRecord)
         localStorage.setAttribute('lastRecord', this.clicks);
-        this.lastRecord = this.clicks;
         return res;
     };
 
@@ -195,6 +194,7 @@ function menuEventHandler(event) {
     }
     if (event.target.closest('div').getAttribute('id') === 'save') {
         localStorage.setItem('lastRecord', newGame.clicks);
+        newGame.lastRecord = localStorage.getItem('lastRecord')
         alert(` YOUR LAST RECORD IS ${newGame.lastRecord}`);
         return;
     }
