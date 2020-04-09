@@ -9,6 +9,8 @@ class GamePuzzle {
         this.clicks = 0;
         this.arrOfValues;
         this.sortValues;
+        this.lastRecord = localStorage.getItem('lastRecord') | 0;
+        this.currentSize = localStorage.getItem('currentSize') | 0;
     }
 
     move(x, y, currentValues) {
@@ -82,6 +84,9 @@ class GamePuzzle {
                 }
             }
         }
+        if (this.clicks < this.lastRecord)
+        localStorage.setAttribute('lastRecord', this.clicks);
+        this.lastRecord = this.clicks;
         return res;
     };
 
@@ -122,6 +127,10 @@ function loadTheGameField() {
     document.body.append(container);
     document.getElementById('canvas').setAttribute('width', `600`);
     document.getElementById('canvas').setAttribute('height', `600`);
+    let sizeInfo = document.createElement('div');
+    sizeInfo.classList.add('size-info');
+    sizeInfo.innerHTML = `Размер поля: ${2} x ${2}`
+    canvasWrapper.append(sizeInfo);
     let options = document.createElement('div');
     options.classList.add('options');
     let list = document.createElement('ul');
@@ -130,14 +139,14 @@ function loadTheGameField() {
         let listItem = document.createElement('li');
         listItem.innerHTML = `${i + 2} x ${i + 2}`;
         listItem.setAttribute('id', i + 2);
-        listItem.classList.add('listItem');
+        listItem.classList.add('list-item');
         list.append(listItem);
     }
     options.append(list);
     canvasWrapper.append(options);
     let menu = document.createElement('div');
     menu.classList.add('menu');
-    menu.insertAdjacentHTML('afterbegin', `<div class = "menu-item">Размешать и начать</div><div class = "menu-item">Стоп</div><div class = "menu-item">Сохранить</div><div class = "menu-item">Результаты</div>`);
+    menu.insertAdjacentHTML('afterbegin', `<div class = "menu-item" id = "split">Размешать и начать</div><div class = "menu-item" id = "stop">Стоп</div><div class = "menu-item" id = "save">Сохранить</div><div class = "menu-item" id = "results">Результаты</div>`);
     canvasWrapper.prepend(menu);
 }
 loadTheGameField();
@@ -149,7 +158,10 @@ newGame.draw(currentValues);
 
 document.querySelector('ul').addEventListener('mousedown', function (event) {
     let pressedKey = event.target.closest('li');
-    newGame = new GamePuzzle(pressedKey.getAttribute('id'));
+    let size = pressedKey.getAttribute('id');
+    localStorage.setItem('currentSize', size);
+    document.querySelector('.size-info').innerHTML = `Размер поля: ${size} x ${size}`
+    newGame = new GamePuzzle(size);
     currentValues = newGame.getMixedItems();
     newGame.draw(currentValues);
 });
@@ -162,12 +174,38 @@ document.querySelector('canvas').addEventListener('mouseup', function (e) {
     newGame.move(x, y, currentValues);
 });
 
-document.querySelector('canvas').addEventListener('click', function (e) {
-
+document.querySelector('canvas').addEventListener('click', function (event) {
     if (newGame.victory(currentValues)) {
+        
         setTimeout(function () { alert("Собрано за " + newGame.clicks + " касание!") }, 500);
     }
 });
+
+function menuEventHandler(event) {
+    if (event.target.closest('div').getAttribute('id') === 'split') {
+        let currentSize = newGame.currentSize;
+        newGame = new GamePuzzle(currentSize);
+        currentValues = newGame.getMixedItems();
+        newGame.draw(currentValues);
+        return;
+    }
+    if (event.target.closest('div').getAttribute('id') === 'stop') {
+        alert(`current step is ${newGame.clicks}`);
+        return;
+    }
+    if (event.target.closest('div').getAttribute('id') === 'save') {
+        localStorage.setItem('lastRecord', newGame.clicks);
+        alert(` YOUR LAST RECORD IS ${newGame.lastRecord}`);
+        return;
+    }
+    if (event.target.closest('div').getAttribute('id') === 'results') {
+        localStorage.setItem('lastRecord', newGame.clicks);
+        alert(` Your current result is ${newGame.clicks} your Record is ${newGame.lastRecord}`);
+        return;
+    }
+}
+
+document.querySelector('.menu').addEventListener('click', menuEventHandler);
 
 console.log(newGame.getMixedItems() + 'mixedValues');
 console.log(newGame.getSortValues() + 'sortValues');
