@@ -65,6 +65,11 @@ html {
     padding: 10px;
 }
 
+.current-game-info {
+    display: flex;
+    justify-content: space-around;
+}
+
 @media (max-width: 900px) {
     .container {
         max-width: 900px;
