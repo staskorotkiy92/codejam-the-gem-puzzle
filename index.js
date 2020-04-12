@@ -9,6 +9,8 @@ class GamePuzzle {
         this.clicks = 0;
         this.arrOfValues;
         this.sortValues;
+        this.lastRecord = localStorage.getItem('lastRecord') | 0;
+        this.currentSize = localStorage.getItem('currentSize') | 0;
     }
 
     move(x, y, currentValues) {
@@ -82,6 +84,8 @@ class GamePuzzle {
                 }
             }
         }
+        if (this.clicks < this.lastRecord)
+            localStorage.setAttribute('lastRecord', this.clicks);
         return res;
     };
 
@@ -110,8 +114,22 @@ class GamePuzzle {
 
 }
 
+function timerInterval() {
+    let time = 0;
+    timeStart = new Date().getTime();
+    let timer = setInterval(function () {
+
+        let distance = new Date().getTime() - timeStart + time;
+        let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        document.getElementById('timer').innerText = `Time: ${minutes} : ${seconds}`;
+
+    }, 1000);
+}
+
 
 function loadTheGameField() {
+
     let canvas = '<canvas class = "canvas" id = "canvas"></canvas>';
     let container = document.createElement('div');
     let canvasWrapper = document.createElement('div');
@@ -122,53 +140,98 @@ function loadTheGameField() {
     document.body.append(container);
     document.getElementById('canvas').setAttribute('width', `600`);
     document.getElementById('canvas').setAttribute('height', `600`);
+    let sizeInfo = document.createElement('div');
+    sizeInfo.classList.add('size-info');
+    sizeInfo.innerHTML = `Размер поля: ${2} x ${2}`
+    canvasWrapper.append(sizeInfo);
     let options = document.createElement('div');
     options.classList.add('options');
     let list = document.createElement('ul');
     list.classList.add('options-list');
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 6; i++) {
         let listItem = document.createElement('li');
-        listItem.innerHTML = `${i + 2} x ${i + 2}`;
-        listItem.setAttribute('id', i + 2);
-        listItem.classList.add('listItem');
+        listItem.innerHTML = `${i + 3} x ${i + 3}`;
+        listItem.setAttribute('id', i + 3);
+        listItem.classList.add('list-item');
         list.append(listItem);
     }
     options.append(list);
     canvasWrapper.append(options);
     let menu = document.createElement('div');
     menu.classList.add('menu');
-    menu.insertAdjacentHTML('afterbegin', `<div class = "menu-item">Размешать и начать</div><div class = "menu-item">Стоп</div><div class = "menu-item">Сохранить</div><div class = "menu-item">Результаты</div>`);
+    menu.insertAdjacentHTML('afterbegin', `<div class = "menu-item" id = "split">Размешать и начать</div><div class = "menu-item" id = "stop">Стоп</div><div class = "menu-item" id = "save">Сохранить</div><div class = "menu-item" id = "results">Результаты</div>`);
+
     canvasWrapper.prepend(menu);
+    menu.insertAdjacentHTML('afterend', `<div class = "current-game-info">
+    <div class = "timer" id = "timer">Time:</div>
+    <div class = "steps=count" id = "steps-count">Steps:</div>
+    </div>`);
+
 }
 loadTheGameField();
+timerInterval();
 
-let newGame = new GamePuzzle(2);
+
+let newGame = new GamePuzzle(3);
 let currentValues = newGame.getMixedItems();
 newGame.draw(currentValues);
 
 
 document.querySelector('ul').addEventListener('mousedown', function (event) {
     let pressedKey = event.target.closest('li');
-    newGame = new GamePuzzle(pressedKey.getAttribute('id'));
+    let size = pressedKey.getAttribute('id');
+    localStorage.setItem('currentSize', size);
+    document.querySelector('.size-info').innerHTML = `Размер поля: ${size} x ${size}`
+    newGame = new GamePuzzle(size);
     currentValues = newGame.getMixedItems();
     newGame.draw(currentValues);
 });
 
 
-document.querySelector('canvas').addEventListener('mouseup', function (e) {
-    var x = (e.pageX - newGame.canvas.offsetLeft) / newGame.width | 0;
-    var y = (e.pageY - newGame.canvas.offsetTop) / newGame.height | 0;
-    console.log(e.pageY, newGame.canvas.offsetTop, e.pageX, newGame.canvas.offsetLeft);
+document.querySelector('canvas').addEventListener('mouseup', function (event) {
+    var x = (event.pageX - newGame.canvas.offsetLeft) / newGame.width | 0;
+    var y = (event.pageY - newGame.canvas.offsetTop) / newGame.height | 0;
+    console.log(event.pageY, newGame.canvas.offsetTop, event.pageX, newGame.canvas.offsetLeft);
     newGame.move(x, y, currentValues);
 });
 
-document.querySelector('canvas').addEventListener('click', function (e) {
-
+document.querySelector('canvas').addEventListener('click', function (event) {
+    document.getElementById('steps-count').innerHTML = `Steps:${newGame.clicks}`;
     if (newGame.victory(currentValues)) {
+
         setTimeout(function () { alert("Собрано за " + newGame.clicks + " касание!") }, 500);
     }
 });
 
+function menuEventHandler(event) {
+    if (event.target.closest('div').getAttribute('id') === 'split') {
+        timerInterval();
+        let currentSize = newGame.currentSize;
+        newGame = new GamePuzzle(currentSize);
+        currentValues = newGame.getMixedItems();
+        newGame.draw(currentValues);
+        return;
+    }
+    if (event.target.closest('div').getAttribute('id') === 'stop') {
+        alert(`current step is ${newGame.clicks}`);
+        return;
+    }
+    if (event.target.closest('div').getAttribute('id') === 'save') {
+        localStorage.setItem('lastRecord', newGame.clicks);
+        newGame.lastRecord = localStorage.getItem('lastRecord')
+        alert(` YOUR LAST RECORD IS ${newGame.lastRecord}`);
+        return;
+    }
+    if (event.target.closest('div').getAttribute('id') === 'results') {
+        localStorage.setItem('lastRecord', newGame.clicks);
+        alert(` Your current result is ${newGame.clicks} your Record is ${newGame.lastRecord}`);
+        return;
+    }
+}
+
+document.querySelector('.menu').addEventListener('click', menuEventHandler);
+
 console.log(newGame.getMixedItems() + 'mixedValues');
 console.log(newGame.getSortValues() + 'sortValues');
+
 

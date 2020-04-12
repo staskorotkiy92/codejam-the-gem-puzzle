@@ -4,6 +4,8 @@
 
 html {
     font-size: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: darkslategray;
 }
 
 .container {
@@ -27,7 +29,9 @@ html {
 
 }
 
-.listItem {
+.list-item:hover,
+.menu-item:hover,
+.canvas:hover {
     cursor: pointer;
 }
 
@@ -36,6 +40,10 @@ html {
     display        : flex;
     justify-content: space-between;
     padding        : 0;
+    border-radius: 4px;
+    border: 1px solid grey;
+    background-color: darkolivegreen;
+    line-height: 1;
 }
 
 .menu {
@@ -50,6 +58,16 @@ html {
     border-radius   : 3px;
     padding         : 5px;
     background-color: cyan;
+}
+
+.size-info {
+    align-self: center;
+    padding: 10px;
+}
+
+.current-game-info {
+    display: flex;
+    justify-content: space-around;
 }
 
 @media (max-width: 900px) {
